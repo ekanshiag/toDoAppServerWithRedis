@@ -37,7 +37,10 @@ exports.postTask = (req, res, next) => {
 }
 
 exports.getOneTask = (req, res, next) => {
-    res.status(200).json('Get a task ' + req.params.taskId)
+    const taskId = req.params.taskId
+    client.hgetall(taskId, (err, obj) => {
+        res.status(200).json(obj)
+    })
 }
 
 exports.updateTask = (req, res, next) => {
