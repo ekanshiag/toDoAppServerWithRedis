@@ -5,19 +5,26 @@ client.on('error', (err) => {
     console.log(err)
 })
 
+const {promisify} = require('util')
+const hgetallAsync = promisify(client.hgetall).bind(client)
+
 exports.getAllTasks = (req, res, next) => {
-    res.status(200).json('Get all tasks')
+    client.hvals('tasks', (err, obj) => {
+        let arr = []
+        for(let t of obj){
+            arr.push(hgetallAsync(t))
+        }
+        Promise.all(arr)
+            .then(result => {
+                res.status(200).json(result)
+            })
+    })
 }
 
 exports.postTask = (req, res, next) => {
-    const id = req.body.id
-    const taskCategory = req.body.category
-    const taskDesc = req.body.desc
-    const taskNotes = req.body.notes
-    const taskDueDate = req.body.dueDate
-    const taskPriority = req.body.priority
+    const {id, category, desc, notes, dueDate, priority} = req.body
 
-    client.hmset(id, 'id', id, 'category', taskCategory, 'desc', taskDesc, 'notes', taskNotes, 'dueDate', taskDueDate, 'priority', taskPriority)
+    client.hmset(id, 'id', id, 'category', category, 'desc', desc, 'notes', notes, 'dueDate', dueDate, 'priority', priority)
     client.hgetall(id, (err , obj) => {
         console.log(obj)
     })
