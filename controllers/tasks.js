@@ -43,8 +43,20 @@ exports.getOneTask = (req, res, next) => {
     })
 }
 
+function updateTaskInDb(obj, taskId){
+    let keys = Object.keys(obj)
+    keys.forEach(key => client.hset(taskId, key, obj[key]))
+    return
+}
+
+const updateAsync = promisify(updateTaskInDb)
+
 exports.updateTask = (req, res, next) => {
-    res.status(200).json('Update a task ' + req.params.taskId)
+    const taskId = req.params.taskId
+    let obj = req.body
+    updateAsync(obj, taskId)
+        .then(res.status(200).json('Task updated'))
+
 }
 
 exports.deleteTask = (req, res, next) => {
