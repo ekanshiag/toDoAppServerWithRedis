@@ -48,5 +48,9 @@ exports.updateTask = (req, res, next) => {
 }
 
 exports.deleteTask = (req, res, next) => {
-    res.status(200).json('Delete a task ' + req.params.taskId)
+    const taskId = req.params.taskId
+    client.hdel('tasks', 'task'+taskId)
+    client.del(taskId, (err, obj) => {
+        res.status(200).json('Task deleted')
+    })
 }
