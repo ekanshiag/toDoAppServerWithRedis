@@ -10,7 +10,23 @@ exports.getAllTasks = (req, res, next) => {
 }
 
 exports.postTask = (req, res, next) => {
-    res.status(200).json('Post a task')
+    const id = req.body.id
+    const taskCategory = req.body.category
+    const taskDesc = req.body.desc
+    const taskNotes = req.body.notes
+    const taskDueDate = req.body.dueDate
+    const taskPriority = req.body.priority
+
+    client.hmset(id, 'id', id, 'category', taskCategory, 'desc', taskDesc, 'notes', taskNotes, 'dueDate', taskDueDate, 'priority', taskPriority)
+    client.hgetall(id, (err , obj) => {
+        console.log(obj)
+    })
+
+    client.hset('tasks', 'task'+ id, id)
+    client.hgetall('tasks', (err , obj) => {
+        console.log(obj)
+        res.status(200).json(obj)
+    })
 }
 
 exports.getOneTask = (req, res, next) => {
