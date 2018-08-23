@@ -1,5 +1,6 @@
 const redis = require('redis')
 const client = redis.createClient()
+const uuidv4 = require('uuid/v4')
 
 client.on('error', (err) => {
     console.log(err)
@@ -22,7 +23,8 @@ exports.getAllTasks = (req, res, next) => {
 }
 
 exports.postTask = (req, res, next) => {
-    const {id, category, desc, notes, dueDate, priority} = req.body
+    const {category, desc, notes, dueDate, priority} = req.body
+    let id = uuidv4()
 
     client.hmset(id, 'id', id, 'category', category, 'desc', desc, 'notes', notes, 'dueDate', dueDate, 'priority', priority)
     client.hgetall(id, (err , obj) => {
